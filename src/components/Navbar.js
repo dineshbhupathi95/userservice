@@ -1,27 +1,41 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Layout, Menu, Button, Typography } from 'antd';
+
+const { Header } = Layout;
+const { Text } = Typography;
 
 function Navbar({ isAuthenticated, user, onLogout }) {
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">
-        <Link to="/">Albeny</Link>
-      </div>
+    <Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#001529', padding: '0 20px' }}>
+      <Text style={{ color: 'white', fontSize: '20px', fontWeight: 'bold' }}>
+        <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Albeny</Link>
+      </Text>
       
-      <div className="navbar-menu">
+      <Menu theme="dark" mode="horizontal" selectable={false} style={{ flex: 1, justifyContent: 'end', background: 'transparent' }}>
         {isAuthenticated ? (
           <>
-            <span className="navbar-item">Hello, {user?.username}</span>
-            <button onClick={onLogout} className="btn btn-outline">Logout</button>
+            <Menu.Item key="user" style={{ color: 'white' }}>
+              Hello, {user?.username}
+            </Menu.Item>
+            <Menu.Item key="logout">
+              <Button type="primary" onClick={onLogout} danger>
+                Logout
+              </Button>
+            </Menu.Item>
           </>
         ) : (
           <>
-            <Link to="/login" className="navbar-item">Login</Link>
-            <Link to="/register" className="navbar-item">Register</Link>
+            <Menu.Item key="login">
+              <Link to="/login">Login</Link>
+            </Menu.Item>
+            <Menu.Item key="register">
+              <Link to="/register">Register</Link>
+            </Menu.Item>
           </>
         )}
-      </div>
-    </nav>
+      </Menu>
+    </Header>
   );
 }
 

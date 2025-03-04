@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Form, Input, Button, Card, Typography, Alert } from 'antd';
+
+const { Title, Text } = Typography;
 
 function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [form] = Form.useForm();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  const handleSubmit = async (values) => {
     setError('');
     setIsLoading(true);
     
     try {
-      // Create form data for API
       const formData = new FormData();
-      formData.append('username', username);
-      formData.append('password', password);
+      formData.append('username', values.username);
+      formData.append('password', values.password);
       
       const response = await fetch('http://localhost:8000/token', {
         method: 'POST',
@@ -29,11 +29,8 @@ function Login({ onLogin }) {
         throw new Error(data.detail || 'Login failed');
       }
       
-      // Get user profile
       const userResponse = await fetch('http://localhost:8000/users/me/', {
-        headers: {
-          'Authorization': `Bearer ${data.access_token}`
-        }
+        headers: { 'Authorization': `Bearer ${data.access_token}` },
       });
       
       if (!userResponse.ok) {
@@ -41,8 +38,6 @@ function Login({ onLogin }) {
       }
       
       const userData = await userResponse.json();
-      
-      // Call the login function from parent component
       onLogin(data.access_token, userData);
     } catch (err) {
       setError(err.message);
@@ -52,48 +47,31 @@ function Login({ onLogin }) {
   };
   
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Login</h2>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Card style={{ width: 400, padding: 20, boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+        <Title level={2} style={{ textAlign: 'center' }}>Login</Title>
+        {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
         
-        {error && <div className="error-message">{error}</div>}
-        
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item label="Username" name="username" rules={[{ required: true, message: 'Please enter your username' }]}> 
+            <Input placeholder="Enter username" />
+          </Form.Item>
           
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please enter your password' }]}> 
+            <Input.Password placeholder="Enter password" />
+          </Form.Item>
           
-          <button 
-            type="submit" 
-            className="btn btn-primary"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block loading={isLoading}>
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
         
-        <p className="auth-link">
+        <Text style={{ display: 'block', textAlign: 'center' }}>
           Don't have an account? <Link to="/register">Register</Link>
-        </p>
-      </div>
+        </Text>
+      </Card>
     </div>
   );
 }
