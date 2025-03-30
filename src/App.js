@@ -4,6 +4,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import Navbar from './components/Navbar';
+import MainLayout from './components/MainView';
+import Reports from './components/Report';
 import './App.css';
 
 function App() {
@@ -79,7 +81,15 @@ function App() {
               path="/dashboard" 
               element={
                 isAuthenticated ? 
-                <Dashboard user={user} /> : 
+                <MainLayout user={user}/> : 
+                <Navigate to="/login" />
+              } 
+            />
+            <Route 
+              path="/reports" 
+              element={
+                isAuthenticated ? 
+                <MainLayout user={user}/>: 
                 <Navigate to="/login" />
               } 
             />
@@ -87,6 +97,7 @@ function App() {
               path="/" 
               element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} 
             />
+             <Route path="*" element={<MainLayout user={user}/>} /> {/* Handles unknown routes */}
           </Routes>
         </main>
       </div>
